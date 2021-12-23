@@ -195,12 +195,16 @@ void zwrocPoprz(List* Lista) {
 		cout << "NULL" << endl;
 }
 void usunPierwszy(List* Lista) {
+
 	if (Lista->poczatek == Lista->koniec) {
 		Lista->poczatek = NULL;
 		Lista->koniec = NULL;
 		Lista->aktualny = NULL;
 	}
 	else {
+		if (Lista->aktualny == Lista->poczatek) {
+			Lista->aktualny = Lista->koniec;
+		}
 		elem* drugi;// = (elem*)malloc(sizeof(elem));
 		elem* trzeci;// = (elem*)malloc(sizeof(elem));
 		drugi = XOR(Lista->poczatek->xored_wskazniki, 0);
@@ -216,12 +220,16 @@ void usunPierwszy(List* Lista) {
 }
 
 void usunOstatni(List* Lista) {
+
 	if (Lista->poczatek == Lista->koniec) {
 		Lista->poczatek = NULL;
 		Lista->koniec = NULL;
 		Lista->aktualny = NULL;
 	}
 	else {
+		if (Lista->aktualny == Lista->koniec) {
+			Lista->aktualny = XOR(Lista->koniec->xored_wskazniki, 0);
+		}
 		elem* przedostatni;
 		elem* przedprzedostatni;
 		przedostatni = XOR(Lista->koniec->xored_wskazniki, 0);
@@ -267,9 +275,95 @@ void usunAktual(List* Lista) {
 		}
 	}
 }
-void usunZWartosciaA(List* Lista, int wartosc) {
-	//do zrobienia
-	wartosc = wartosc;
+void usunZWartosciaA(List* Lista, elem* poprzedni, elem* biezaczy, int wartosc) {
+	if (biezaczy->value == wartosc) {
+		if (biezaczy == Lista->poczatek) {
+			usunPierwszy(Lista);
+			usunZWartosciaA(Lista, 0, Lista->poczatek, wartosc);
+		}
+		else if (biezaczy == Lista->koniec) {
+			usunOstatni(Lista);
+		}
+		else {
+			poprzedni->xored_wskazniki = XOR(XOR(poprzedni->xored_wskazniki, biezaczy), XOR(biezaczy->xored_wskazniki, poprzedni));
+			XOR(biezaczy->xored_wskazniki, poprzedni)->xored_wskazniki = XOR(XOR(XOR(biezaczy->xored_wskazniki, poprzedni)->xored_wskazniki, biezaczy), poprzedni);
+			if (biezaczy == Lista->aktualny)
+				Lista->aktualny = poprzedni;
+
+			usunZWartosciaA(Lista, poprzedni, XOR(biezaczy->xored_wskazniki, poprzedni), wartosc);
+		}
+	}
+	else {
+		if (biezaczy != Lista->koniec) {
+			usunZWartosciaA(Lista, biezaczy, XOR(biezaczy->xored_wskazniki, poprzedni), wartosc);
+		}
+	}
+
+
+
+
+
+	/*if (biezaczy != NULL) {
+		elem* nastepny = XOR(biezaczy->xored_wskazniki, poprzedni);
+		if (biezaczy == Lista->poczatek) {
+			if (biezaczy->value == wartosc) {
+				usunPierwszy(Lista);
+				usunZWartosciaA(Lista, 0, Lista->poczatek, wartosc);
+			}
+			else if (nastepny != NULL)
+				usunZWartosciaA(Lista, biezaczy, nastepny, wartosc);
+		}
+		else {
+			if (biezaczy != Lista->koniec) {
+				poprzedni->xored_wskazniki = XOR(XOR(poprzedni->xored_wskazniki, biezaczy), nastepny);
+				nastepny->xored_wskazniki = XOR(XOR(nastepny->xored_wskazniki, biezaczy), poprzedni);
+				if (biezaczy == Lista->aktualny)
+					Lista->aktualny = poprzedni;
+				//free(biezaczy);
+				if (nastepny != NULL)
+					usunZWartosciaA(Lista, poprzedni, nastepny, wartosc);
+			}
+			else
+				if (biezaczy->value == wartosc)
+					usunOstatni(Lista);
+		}
+	}
+	if (biezaczy != NULL) {
+		elem* nastepny = XOR(biezaczy->xored_wskazniki, poprzedni);
+		if (biezaczy == Lista->poczatek) {
+			if (biezaczy->value == wartosc) {
+				usunPierwszy(Lista);
+				usunZWartosciaA(Lista, 0, Lista->poczatek, wartosc);
+			}
+			else if (nastepny != NULL)
+				usunZWartosciaA(Lista, biezaczy, nastepny, wartosc);
+			else
+				;
+		}
+		else {
+			if (biezaczy == Lista->koniec) {
+				if (biezaczy->value == wartosc) {
+					usunOstatni(Lista);
+				}
+				else;
+			}
+			else if (biezaczy->value == wartosc) {
+				poprzedni->xored_wskazniki = XOR(XOR(poprzedni->xored_wskazniki, biezaczy), nastepny);
+				nastepny->xored_wskazniki = XOR(XOR(nastepny->xored_wskazniki, biezaczy), poprzedni);
+				if (biezaczy == Lista->aktualny)
+					Lista->aktualny = poprzedni;
+				//free(biezaczy);
+				if (nastepny != NULL)
+					usunZWartosciaA(Lista, poprzedni, nastepny, wartosc);
+				else
+					;
+			}
+			if (nastepny != NULL)
+				usunZWartosciaA(Lista, biezaczy, nastepny, wartosc);
+			else
+				;
+		}
+	}*/
 }
 void drukujNormalnie(elem* poprzedni, elem* aktualny) {
 	cout << aktualny->value << "  ";
@@ -373,7 +467,8 @@ int main() {
 		else if (!strcmp(komenda, "DEL_VAL")) {
 			cin >> znak;
 			//cout << "8:DEL_ACT" << endl;
-			usunZWartosciaA(&Lista, znak);
+
+			usunZWartosciaA(&Lista, 0, Lista.poczatek, znak);
 		}
 		//else if (komenda == "PRINT_FORWARD") {
 		else if (!strcmp(komenda, "PRINT_FORWARD")) {
