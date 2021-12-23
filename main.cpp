@@ -160,6 +160,8 @@ void zwrocAktual(List* Lista) {
 	if (czyPusta(Lista) == false) {
 		if (Lista->aktualny != NULL)
 			cout << Lista->aktualny->value << endl;
+		else
+			cout << "NULL" << endl;
 	}
 	else
 		cout << "NULL" << endl;
@@ -376,16 +378,24 @@ int main() {
 		//else if (komenda == "PRINT_FORWARD") {
 		else if (!strcmp(komenda, "PRINT_FORWARD")) {
 			//cout << "9:PRINT_FORWARD" << endl;
-			if (Lista.poczatek != NULL)
-				drukujNormalnie(0, Lista.poczatek);
-			cout << endl;
+			if (czyPusta(&Lista) == true)
+				cout << "NULL" << endl;
+			else {
+				if (Lista.poczatek != NULL)
+					drukujNormalnie(0, Lista.poczatek);
+				cout << endl;
+			}
 		}
 		//else if (komenda == "PRINT_BACKWARD") {
 		else if (!strcmp(komenda, "PRINT_BACKWARD")) {
 			//cout << "10:PRINT_BACKWARD" << endl;
-			if (Lista.koniec != NULL)
-				drukujOdTylu(0, Lista.koniec);
-			cout << endl;
+			if (czyPusta(&Lista) == true)
+				cout << "NULL" << endl;
+			else {
+				if (Lista.koniec != NULL)
+					drukujOdTylu(0, Lista.koniec);
+				cout << endl;
+			}
 		}
 	}
 
