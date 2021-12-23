@@ -1,5 +1,5 @@
 #include<iostream>
-#include<string>
+//#include<string>
 using namespace std;
 int LiczbaElementow = 0;
 struct elem {
@@ -16,7 +16,7 @@ elem* XOR(elem* e1, elem* e2) {
 }
 elem* szukajNastepnikaAktualnej(elem* przedostatni, elem* ostatni, List* Lista) {
 
-	elem* przedostatni2;// = (elem*)malloc(sizeof(elem));
+	elem* przedostatni2 = (elem*)malloc(sizeof(elem));
 	przedostatni2 = XOR(przedostatni->xored_wskazniki, ostatni);
 	if (przedostatni == Lista->aktualny)
 		return ostatni;
@@ -28,7 +28,7 @@ elem* szukajNastepnikaAktualnej(elem* przedostatni, elem* ostatni, List* Lista) 
 
 }
 elem* szukajPoprzednikaAktualnej(elem* pierwszy, elem* nastepny, List* Lista) {
-	elem* nastepny2;// = (elem*)malloc(sizeof(elem));
+	elem* nastepny2 = (elem*)malloc(sizeof(elem));
 	nastepny2 = XOR(nastepny->xored_wskazniki, pierwszy);
 	if (nastepny == Lista->aktualny)
 		return pierwszy;
@@ -128,7 +128,7 @@ void dodajPrzedAktualny(List* Lista, int wartosc) {
 }
 
 void zwrocAktual(List* Lista) {
-	if (czyPusta(Lista) != NULL) {
+	if (czyPusta(Lista) == false) {
 		if (Lista->aktualny != NULL)
 			cout << Lista->aktualny->value << endl;
 	}
@@ -137,15 +137,31 @@ void zwrocAktual(List* Lista) {
 }
 void zwrocNast(List* Lista) {
 	if (czyPusta != NULL) {
-		Lista->aktualny = szukajNastepnikaAktualnej(Lista->koniec, 0, Lista);
-		zwrocAktual(Lista);
+		if (Lista->aktualny == Lista->koniec) {
+			Lista->aktualny = Lista->poczatek;
+			zwrocAktual(Lista);
+		}
+		else {
+			Lista->aktualny = szukajNastepnikaAktualnej(Lista->koniec, 0, Lista);
+			zwrocAktual(Lista);
+		}
 	}
 	else
 		cout << "NULL" << endl;
 }
 void zwrocPoprz(List* Lista) {
-	Lista->aktualny = szukajPoprzednikaAktualnej(0, Lista->poczatek, Lista);
-	zwrocAktual(Lista);
+	if (czyPusta != NULL) {
+		if (Lista->aktualny == Lista->poczatek) {
+			Lista->aktualny = Lista->koniec;
+			zwrocAktual(Lista);
+		}
+		else {
+			Lista->aktualny = szukajPoprzednikaAktualnej(0, Lista->poczatek, Lista);
+			zwrocAktual(Lista);
+		}
+	}
+	else
+		cout << "NULL" << endl;
 }
 void usunPierwszy(List* Lista) {
 	elem* drugi;// = (elem*)malloc(sizeof(elem));
@@ -172,14 +188,32 @@ void usunOstatni(List* Lista) {
 	Lista->koniec->xored_wskazniki = XOR(0, przedprzedostatni);
 }
 void usunAktual(List* Lista) {
-	Lista->aktualny = Lista->aktualny;
+	//Lista->aktualny=Lista->aktualny;
+	elem* Poprzedni;
+	elem* Nastepny;
+	elem* PoprzednikPoprzednika;
+	elem* NastepnikNastepnika;
+	Poprzedni = szukajPoprzednikaAktualnej(0, Lista->poczatek, Lista);
+	Nastepny = szukajNastepnikaAktualnej(Lista->koniec, 0, Lista);
+	PoprzednikPoprzednika = XOR(Poprzedni->xored_wskazniki, Lista->aktualny);
+	NastepnikNastepnika = XOR(Nastepny->xored_wskazniki, Lista->aktualny);
+	Poprzedni->xored_wskazniki = XOR(PoprzednikPoprzednika, Nastepny);
+	Nastepny->xored_wskazniki = XOR(Poprzedni, NastepnikNastepnika);
+	if (Poprzedni != NULL) {
+		free(Lista->aktualny);
+		Lista->aktualny = Poprzedni;
+	}
+	else {
+		free(Lista->aktualny);
+		Lista->aktualny = Lista->koniec;
+	}
 }
 void usunZWartosciaA(List* Lista, int wartosc) {
 	wartosc = wartosc;
 }
 void drukujNormalnie(elem* poprzedni, elem* aktualny) {
 	cout << aktualny->value << "  ";
-	elem* nowy;// = (elem*)malloc(sizeof(elem));
+	elem* nowy = (elem*)malloc(sizeof(elem));
 	nowy = XOR(poprzedni, aktualny->xored_wskazniki);
 	if (nowy != NULL) {
 		drukujNormalnie(aktualny, nowy);
@@ -190,7 +224,7 @@ void drukujNormalnie(elem* poprzedni, elem* aktualny) {
 
 void drukujOdTylu(elem* nastepny, elem* aktualny) {
 	cout << aktualny->value << "  ";
-	elem* nowy;// = (elem*)malloc(sizeof(elem));
+	elem* nowy = (elem*)malloc(sizeof(elem));
 	nowy = XOR(nastepny, aktualny->xored_wskazniki);
 	if (nowy != NULL) {
 		drukujOdTylu(aktualny, nowy);
@@ -211,7 +245,7 @@ int main() {
 	dodajNakoniec(&Lista, 10);
 	drukujNormalnie(0,Lista.poczatek);*/
 	//WAZNE - dostep do poprzedniego elementu
-	//elem* nowy;// = (elem*)malloc(sizeof(elem));
+	//elem* nowy = (elem*)malloc(sizeof(elem));
 	//nowy= XOR(Lista.koniec->xored_wskazniki, 0);
 	//----Lista.koniec->xored_wskazniki=XOR()
 	while (cin >> komenda) {
@@ -242,10 +276,10 @@ int main() {
 		else if (!strcmp(komenda, "ACTUAL")) {
 			//cout << "3:ACTUAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 			zwrocAktual(&Lista);
-			//elem* pop;// = (elem*)malloc(sizeof(elem));
+			//elem* pop = (elem*)malloc(sizeof(elem));
 			//pop = szukajNastepnikaAktualnej(Lista.koniec,0, &Lista);
 			//cout << endl << endl << pop->value << endl << endl;
-			//elem* nast;// = (elem*)malloc(sizeof(elem));
+			//elem* nast = (elem*)malloc(sizeof(elem));
 			//nast = szukajPoprzednikaAktualnej(0, Lista.poczatek, &Lista);
 			//cout << endl << endl << nast->value << endl << endl;
 			//dodajPrzedAktualny(&Lista, znak);
